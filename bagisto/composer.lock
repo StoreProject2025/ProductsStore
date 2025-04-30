@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cac99f9f3644bff8b7c2e4585221dab3",
+    "content-hash": "b83415d1e86d99cae82e98700d99015b",
     "packages": [
         {
             "name": "astrotomic/laravel-translatable",
@@ -10727,58 +10727,6 @@
     ],
     "packages-dev": [
         {
-            "name": "bagisto/laravel-datafaker",
-            "version": "v2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/bagisto/laravel-data-faker.git",
-                "reference": "26660106b3a75168accea6b2bb17c4dc2fd95543"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/bagisto/laravel-data-faker/zipball/26660106b3a75168accea6b2bb17c4dc2fd95543",
-                "reference": "26660106b3a75168accea6b2bb17c4dc2fd95543",
-                "shasum": ""
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": [],
-                    "providers": [
-                        "Webkul\\Faker\\Providers\\FakerServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Webkul\\Faker\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Bagisto Data Faker",
-                    "email": "support@bagisto.com"
-                }
-            ],
-            "description": "Create fake customers, categories and products in Bagisto.",
-            "homepage": "https://github.com/bagisto/laravel-data-faker",
-            "keywords": [
-                "bagisto",
-                "fake categories",
-                "fake customers",
-                "fake products"
-            ],
-            "support": {
-                "issues": "https://github.com/bagisto/laravel-data-faker/issues",
-                "source": "https://github.com/bagisto/laravel-data-faker/tree/v2.2.0"
-            },
-            "time": "2024-09-30T09:26:10+00:00"
-        },
-        {
             "name": "barryvdh/laravel-debugbar",
             "version": "v3.15.2",
             "source": {
@@ -13895,6 +13843,6 @@
         "ext-pdo_mysql": "*",
         "ext-tokenizer": "*"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }

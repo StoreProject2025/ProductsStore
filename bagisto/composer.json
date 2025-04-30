@@ -47,7 +47,6 @@
         "spatie/laravel-sitemap": "^7.3"
     },
     "require-dev": {
-        "bagisto/laravel-datafaker": "2.2.*",
         "barryvdh/laravel-debugbar": "^3.8",
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.19",

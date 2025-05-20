@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('home') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                        <x-application-logo class="block h-9 w-auto fill-current text-[#309898]" />
                     </a>
                 </div>
 
@@ -15,14 +15,36 @@
                     <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
                         {{ __('Home') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                    
+                    <!-- Categories Dropdown -->
+                    <div class="nav-dropdown">
+                        <button class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 focus:outline-none transition duration-150 ease-in-out">
+                            Categories
+                            <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div class="nav-dropdown-content">
+                            @if(isset($categories) && $categories->count() > 0)
+                                @foreach($categories as $category)
+                                    <a href="{{ route('categories.show', $category) }}" class="nav-dropdown-item">
+                                        {{ $category->name }}
+                                    </a>
+                                @endforeach
+                            @else
+                                <div class="nav-dropdown-item text-gray-500">
+                                    No categories available
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
                     <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                         {{ __('Products') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
-                        {{ __('Categories') }}
+                    
+                    <x-nav-link :href="route('deals')" :active="request()->routeIs('deals')">
+                        {{ __('Deals') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -44,45 +66,37 @@
                 </a>
 
                 @auth
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
-
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile Settings') }}
-                        </x-dropdown-link>
-                        <x-dropdown-link :href="route('orders')">
-                            {{ __('My Orders') }}
-                        </x-dropdown-link>
-                        <x-dropdown-link :href="route('wishlist')">
-                            {{ __('My Wishlist') }}
-                        </x-dropdown-link>
-
-                        <!-- Authentication -->
+                <div class="nav-dropdown">
+                    <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                        <div>{{ Auth::user()->name }}</div>
+                        <div class="ms-1">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </button>
+                    <div class="nav-dropdown-content">
+                        <a href="{{ route('profile.edit') }}" class="nav-dropdown-item">
+                            Profile Settings
+                        </a>
+                        <a href="{{ route('orders') }}" class="nav-dropdown-item">
+                            My Orders
+                        </a>
+                        <a href="{{ route('wishlist') }}" class="nav-dropdown-item">
+                            My Wishlist
+                        </a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
+                            <button type="submit" class="nav-dropdown-item w-full text-left">
+                                Log Out
+                            </button>
                         </form>
-                    </x-slot>
-                </x-dropdown>
+                    </div>
+                </div>
                 @else
                 <div class="flex items-center space-x-4">
-                    <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-gray-900">Login</a>
-                    <a href="{{ route('register') }}" class="text-sm text-gray-700 hover:text-gray-900">Register</a>
+                    <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-[#309898]">Login</a>
+                    <a href="{{ route('register') }}" class="text-sm text-gray-700 hover:text-[#309898]">Register</a>
                 </div>
                 @endauth
             </div>
@@ -105,14 +119,11 @@
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
                 {{ __('Home') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                 {{ __('Products') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
-                {{ __('Categories') }}
+            <x-responsive-nav-link :href="route('deals')" :active="request()->routeIs('deals')">
+                {{ __('Deals') }}
             </x-responsive-nav-link>
         </div>
 

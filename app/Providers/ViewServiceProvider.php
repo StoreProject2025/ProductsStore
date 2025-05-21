@@ -21,9 +21,11 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Share categories with all views
+        // Share only parent categories with all views
         View::composer('*', function ($view) {
-            $view->with('categories', Category::where('is_active', true)->get());
+            $view->with('categories', Category::where('is_active', true)
+                ->whereNull('parent_id')
+                ->get());
         });
     }
 } 

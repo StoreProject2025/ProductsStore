@@ -87,24 +87,36 @@ class ProductsController extends Controller {
     return view('products.edit', compact('product', 'categories'));
   }
 
-  public function save(Request $request, Product $product = null) {
+  public function save(Request $request, Product $product = null)
+  {
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'required|string',
+        'price' => 'required|numeric|min:0',
+        'discount' => 'nullable|numeric|min:0|max:100',
+        'category_id' => 'required|exists:categories,id',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+    ]);
 
-    $this->validate($request, [
-          'code' => ['required', 'string', 'max:32'],
-          'name' => ['required', 'string', 'max:128'],
-          'model' => ['required', 'string', 'max:256'],
-          'description' => ['required', 'string', 'max:1024'],
-          'price' => ['required', 'numeric'],
-          'stock' => ['required', 'integer', 'min:0'],
-      ]);
+    if ($product) {
+        // Update existing product
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($product->image) {
+                Storage::delete($product->image);
+            }
+            $validated['image'] = $request->file('image')->store('products', 'public');
+        }
+        $product->update($validated);
+    } else {
+        // Create new product
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('products', 'public');
+        }
+        $product = Product::create($validated);
+    }
 
-    $product = $product??new Product();
-    $product->fill($request->all());
-    \Log::info('Saving product with stock: ' . $request->stock);
-    $product->save();
-    \Log::info('Product saved with stock: ' . $product->stock);
-
-    return redirect()->route('products_list');
+    return redirect()->route('products.index')->with('success', 'Product saved successfully');
   }
 
   public function delete(Request $request, Product $product) {
@@ -166,32 +178,65 @@ class ProductsController extends Controller {
 
   public function update(Request $request, Product $product)
   {
-      $request->validate([
-          'name' => 'required|string|max:255',
-          'description' => 'required|string',
-          'price' => 'required|numeric|min:0',
-          'category_id' => 'required|exists:categories,id',
-          'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-          'is_active' => 'boolean'
-      ]);
+    \Log::info('Update request received', [
+        'product_slug' => $product->slug,
+        'request_method' => $request->method(),
+        'request_data' => $request->all()
+    ]);
 
-      $data = $request->all();
-      $data['slug'] = Str::slug($request->name);
-      
-      if ($request->hasFile('image')) {
-          // Delete old image
-          if ($product->image) {
-              Storage::disk('public')->delete($product->image);
-          }
-          
-          $imagePath = $request->file('image')->store('products', 'public');
-          $data['image'] = $imagePath;
-      }
+    try {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'discount' => 'nullable|numeric|min:0|max:100',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+            'is_flash_sale' => 'boolean',
+        ]);
 
-      $product->update($data);
+        \Log::info('Validation passed', ['validated_data' => $validated]);
 
-      return redirect()->route('products.index')
-          ->with('success', 'Product updated successfully.');
+        // Handle boolean fields
+        $validated['is_active'] = $request->boolean('is_active');
+        $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['is_flash_sale'] = $request->boolean('is_flash_sale');
+
+        \Log::info('Boolean fields processed', [
+            'is_active' => $validated['is_active'],
+            'is_featured' => $validated['is_featured'],
+            'is_flash_sale' => $validated['is_flash_sale']
+        ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $validated['image'] = $request->file('image')->store('products', 'public');
+            \Log::info('Image uploaded', ['image_path' => $validated['image']]);
+        }
+
+        // Update the product
+        $updated = $product->update($validated);
+        \Log::info('Product update result', ['success' => $updated]);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Product updated successfully.');
+    } catch (\Exception $e) {
+        \Log::error('Error updating product', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        return back()
+            ->withInput()
+            ->with('error', 'Error updating product: ' . $e->getMessage());
+    }
   }
 
   public function destroy(Product $product)

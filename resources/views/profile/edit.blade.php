@@ -1,139 +1,183 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile Settings') }}
-        </h2>
-    </x-slot>
+@extends('layouts.master')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <!-- Profile Information -->
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <section>
-                        <header>
-                            <h2 class="text-lg font-medium text-gray-900">
-                                {{ __('Profile Information') }}
-                            </h2>
+@section('title', 'Edit Profile')
 
-                            <p class="mt-1 text-sm text-gray-600">
-                                {{ __("Update your account's profile information and email address.") }}
-                            </p>
-                        </header>
-
-                        <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
-                            @csrf
-                            @method('put')
-
-                            <div>
-                                <x-input-label for="name" :value="__('Name')" />
-                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-                                <x-input-error class="mt-2" :messages="$errors->get('name')" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="email" :value="__('Email')" />
-                                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-                                <x-input-error class="mt-2" :messages="$errors->get('email')" />
-                            </div>
-
-                            <div class="flex items-center gap-4">
-                                <x-primary-button>{{ __('Save Changes') }}</x-primary-button>
-
-                                @if (session('status') === 'profile-updated')
-                                    <p
-                                        x-data="{ show: true }"
-                                        x-show="show"
-                                        x-transition
-                                        x-init="setTimeout(() => show = false, 2000)"
-                                        class="text-sm text-gray-600"
-                                    >{{ __('Profile updated successfully.') }}</p>
-                                @endif
-                            </div>
-                        </form>
-                    </section>
+@section('content')
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <img src="{{ auth()->user()->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&color=7F9CF5&background=EBF4FF' }}" alt="{{ auth()->user()->name }}" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                        <h5 class="mt-3">{{ auth()->user()->name }}</h5>
+                        <p class="text-muted">{{ auth()->user()->email }}</p>
+                    </div>
+                    <div class="list-group">
+                        <a href="{{ route('profile.edit') }}" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-user me-2"></i> Profile Information
+                        </a>
+                        <a href="{{ route('profile.password') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-lock me-2"></i> Update Password
+                        </a>
+                        @if(auth()->user()->hasRole('admin'))
+                            <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-tachometer-alt me-2"></i> Admin Dashboard
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Update Password -->
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <section>
-                        <header>
-                            <h2 class="text-lg font-medium text-gray-900">
-                                {{ __('Update Password') }}
-                            </h2>
-
-                            <p class="mt-1 text-sm text-gray-600">
-                                {{ __("Ensure your account is using a long, random password to stay secure.") }}
-                            </p>
-                        </header>
-
-                        <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
-                            @csrf
-                            @method('put')
-
-                            <div>
-                                <x-input-label for="current_password" :value="__('Current Password')" />
-                                <x-text-input id="current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
-                                <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="password" :value="__('New Password')" />
-                                <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-                                <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-                                <x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-                                <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
-                            </div>
-
-                            <div class="flex items-center gap-4">
-                                <x-primary-button>{{ __('Update Password') }}</x-primary-button>
-
-                                @if (session('status') === 'password-updated')
-                                    <p
-                                        x-data="{ show: true }"
-                                        x-show="show"
-                                        x-transition
-                                        x-init="setTimeout(() => show = false, 2000)"
-                                        class="text-sm text-gray-600"
-                                    >{{ __('Password updated successfully.') }}</p>
-                                @endif
-                            </div>
-                        </form>
-                    </section>
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Profile Information</h4>
                 </div>
-            </div>
+                <div class="card-body">
+                    @if(session('status'))
+                        <div class="alert alert-success">
+                            {{ session('status') }}
+                        </div>
+                    @endif
 
-            <!-- Delete Account -->
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <section>
-                        <header>
-                            <h2 class="text-lg font-medium text-gray-900">
-                                {{ __('Delete Account') }}
-                            </h2>
+                    <form method="POST" action="{{ route('profile.update', auth()->user()->id) }}" enctype="multipart/form-data">
+                        @csrf
 
-                            <p class="mt-1 text-sm text-gray-600">
-                                {{ __("Once your account is deleted, all of its resources and data will be permanently deleted.") }}
-                            </p>
-                        </header>
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', auth()->user()->name) }}" required>
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                        <form method="post" action="{{ route('profile.destroy') }}" class="mt-6">
-                            @csrf
-                            @method('delete')
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', auth()->user()->email) }}" required>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                            <div class="flex items-center gap-4">
-                                <x-danger-button>{{ __('Delete Account') }}</x-danger-button>
+                        <!-- Profile Photo -->
+                        <div class="mb-3">
+                            <label for="profile_photo" class="form-label">Profile Photo</label>
+                            <input type="file" class="form-control @error('profile_photo') is-invalid @enderror" id="profile_photo" name="profile_photo">
+                            @error('profile_photo')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Roles -->
+                        @if(auth()->user()->hasRole('admin'))
+                            <div class="mb-3">
+                                <label class="form-label">Roles</label>
+                                <div class="row">
+                                    @foreach(auth()->user()->roles as $role)
+                                        <div class="col-md-4">
+                                            <div class="card mb-2">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">{{ $role->name }}</h6>
+                                                    <p class="card-text text-muted small">{{ $role->description }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
-                        </form>
-                    </section>
+
+                            <!-- Permissions -->
+                            <div class="mb-3">
+                                <label class="form-label">Permissions</label>
+                                <div class="row">
+                                    @foreach(auth()->user()->getAllPermissions() as $permission)
+                                        <div class="col-md-4">
+                                            <div class="card mb-2">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">{{ $permission->name }}</h6>
+                                                    <p class="card-text text-muted small">{{ $permission->description }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-</x-app-layout>
+</div>
+@endsection
+
+@section('styles')
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        border-radius: 10px;
+    }
+
+    .card-header {
+        background-color: white;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        padding: 1.5rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 0.8rem 1.2rem;
+        margin-bottom: 0.5rem;
+        border-radius: 8px !important;
+        transition: all 0.3s ease;
+    }
+
+    .list-group-item:hover {
+        background-color: var(--light-bg);
+        color: var(--primary-color);
+    }
+
+    .list-group-item.active {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 0.8rem 1rem;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(203, 4, 4, 0.25);
+    }
+
+    .btn-primary {
+        padding: 0.8rem 2rem;
+        border-radius: 8px;
+    }
+
+    .alert {
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+</style>
+@endsection

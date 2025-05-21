@@ -34,12 +34,14 @@ Route::post('/update-credit', [UsersController::class, 'updateCredit'])->name('u
 Route::post('/add-credit', [UsersController::class, 'addCredit'])->name('add.credit');
 Route::get('/purchases', [UsersController::class, 'purchases'])->name('purchases');
 
-Route::get('products', [ProductsController::class, 'list'])->name('products_list');
-Route::get('products/edit/{product?}', [ProductsController::class, 'edit'])->name('products_edit');
-Route::post('products/save/{product?}', [ProductsController::class, 'save'])->name('products_save');
-Route::get('products/delete/{product}', [ProductsController::class, 'delete'])->name('products_delete');
-Route::put('products/hold/{product}', [ProductsController::class, 'hold'])->name('products_hold');
-
+// Product Routes
+Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
+Route::get('/products/create', [ProductsController::class, 'create'])->name('products.create');
+Route::post('/products', [ProductsController::class, 'store'])->name('products.store');
+Route::get('/products/{product}/edit', [ProductsController::class, 'edit'])->name('products.edit');
+Route::put('/products/{product}', [ProductsController::class, 'update'])->name('products.update');
+Route::delete('/products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy');
+Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
 Route::post('/bought-products', [ProductsController::class, 'boughtProducts'])->name('bought_products_list');
 Route::get('/products/insufficient_credit', [ProductsController::class, 'show'])->name('insufficient.credit');
 
@@ -72,9 +74,16 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['throttle:6,1'])->name('verification.send');
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    $bestSellers = \App\Models\Product::where('is_active', 1)->take(8)->get();
+    $categories = \App\Models\Category::where('is_active', 1)->whereNull('parent_id')->get();
+    return view('welcome', compact('bestSellers', 'categories'));
+})->name('home');
 
+Route::get('/welcome', function () {
+    $bestSellers = \App\Models\Product::where('is_active', 1)->take(8)->get();
+    $categories = \App\Models\Category::where('is_active', 1)->whereNull('parent_id')->get();
+    return view('welcome', compact('bestSellers', 'categories'));
+})->name('welcome');
 
 Route::get('/test', function () {
     return view('test');
@@ -97,18 +106,7 @@ Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->
 Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
 Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
-
-// Home Route
-Route::get('/', [HomeController::class, 'index'])->name('home');
-
-// Product Routes
-Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
-Route::get('/products/create', [ProductsController::class, 'create'])->name('products.create');
-Route::post('/products', [ProductsController::class, 'store'])->name('products.store');
-Route::get('/products/{product}/edit', [ProductsController::class, 'edit'])->name('products.edit');
-Route::put('/products/{product}', [ProductsController::class, 'update'])->name('products.update');
-Route::delete('/products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy');
-Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/categories/{category}/subcategories', [CategoryController::class, 'subcategories'])->name('categories.subcategories');
 
 // Cart Routes
 Route::middleware(['auth'])->group(function () {
@@ -129,11 +127,11 @@ Route::middleware(['auth'])->group(function () {
 // Profile Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+    Route::get('/profile/{user?}', [UsersController::class, 'profile'])->name('profile');
+    Route::get('/profile/edit/{user?}', [UsersController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile/update/{user}', [UsersController::class, 'save'])->name('profile.update');
+    Route::get('/profile/password/{user?}', [UsersController::class, 'editPassword'])->name('profile.password');
+    Route::post('/profile/password/{user}', [UsersController::class, 'savePassword'])->name('profile.password.update');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 });

@@ -27,7 +27,7 @@
                         <div class="nav-dropdown-content">
                             @if(isset($categories) && $categories->count() > 0)
                                 @foreach($categories as $category)
-                                    <a href="{{ route('categories.show', $category) }}" class="nav-dropdown-item">
+                                    <a href="{{ route('categories.show', $category->slug) }}" class="nav-dropdown-item">
                                         {{ $category->name }}
                                     </a>
                                 @endforeach
@@ -172,3 +172,61 @@
         </div>
     </div>
 </nav>
+
+<style>
+    .nav-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    .nav-dropdown-content {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 200px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-radius: 4px;
+        z-index: 1000;
+        padding: 8px 0;
+    }
+    .nav-dropdown:hover .nav-dropdown-content {
+        display: block;
+    }
+    .nav-dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        color: #374151;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+    .nav-dropdown-item:hover {
+        background-color: #f3f4f6;
+        color: #309898;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle mobile menu
+    const mobileMenuButton = document.querySelector('[data-mobile-menu-button]');
+    const mobileMenu = document.querySelector('[data-mobile-menu]');
+    
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Handle dropdowns on mobile
+    const dropdownButtons = document.querySelectorAll('[data-dropdown-button]');
+    
+    dropdownButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const dropdown = button.nextElementSibling;
+            dropdown.classList.toggle('hidden');
+        });
+    });
+});
+</script>

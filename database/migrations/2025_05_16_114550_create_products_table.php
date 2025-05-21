@@ -15,8 +15,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description');
             $table->decimal('price', 10, 2);
-            $table->decimal('discount_price', 10, 2)->nullable();
-            $table->decimal('discount_percentage', 5, 2)->nullable();
+            $table->decimal('discount', 5, 2)->default(0);
             $table->integer('stock')->default(0);
             $table->string('image')->nullable();
             $table->json('gallery')->nullable();
@@ -24,6 +23,7 @@ return new class extends Migration
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_flash_sale')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -19,6 +19,7 @@ class CategoryController extends Controller
     {
         $products = $category->products()
             ->where('is_active', true)
+            ->orderBy('created_at', 'desc')
             ->paginate(12);
 
         return view('categories.show', compact('category', 'products'));
@@ -82,5 +83,11 @@ class CategoryController extends Controller
         $category->delete();
         return redirect()->route('categories.index')
             ->with('success', 'Category deleted successfully.');
+    }
+
+    public function subcategories(Category $category)
+    {
+        $subcategories = $category->children()->where('is_active', true)->get();
+        return view('categories.subcategories', compact('category', 'subcategories'));
     }
 } 

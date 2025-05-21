@@ -18,6 +18,7 @@ class CategorySeeder extends Seeder
             'name' => 'Electronics',
             'slug' => 'electronics',
             'icon' => 'fa-laptop',
+            'image' => 'categories/electronics.jpg',
             'is_active' => true,
             'order' => 1
         ]);
@@ -54,6 +55,7 @@ class CategorySeeder extends Seeder
             'name' => 'Clothing',
             'slug' => 'clothing',
             'icon' => 'fa-tshirt',
+            'image' => 'categories/clothing.jpg',
             'is_active' => true,
             'order' => 2
         ]);
@@ -90,6 +92,7 @@ class CategorySeeder extends Seeder
             'name' => 'Books',
             'slug' => 'books',
             'icon' => 'fa-book',
+            'image' => 'categories/books.jpg',
             'is_active' => true,
             'order' => 3
         ]);

@@ -36,6 +36,35 @@ class DatabaseSeeder extends Seeder
         ]);
         $customer->assignRole('Customer');
 
+        // Create permissions
+        $permissions = [
+            'show_users' => 'Show Users',
+            'edit_users' => 'Edit Users',
+            'delete_users' => 'Delete Users',
+            'admin_users' => 'Admin Users',
+            'show_roles' => 'Show Roles',
+            'edit_roles' => 'Edit Roles',
+            'delete_roles' => 'Delete Roles',
+            'admin_roles' => 'Admin Roles',
+            'show_permissions' => 'Show Permissions',
+            'edit_permissions' => 'Edit Permissions',
+            'delete_permissions' => 'Delete Permissions',
+            'admin_permissions' => 'Admin Permissions',
+            'show_categories' => 'Show Categories',
+            'edit_categories' => 'Edit Categories',
+            'delete_categories' => 'Delete Categories',
+            'admin_categories' => 'Admin Categories',
+            'show_products' => 'Show Products',
+            'edit_products' => 'Edit Products',
+            'delete_products' => 'Delete Products',
+            'admin_products' => 'Admin Products',
+            'show_orders' => 'Show Orders',
+            'edit_orders' => 'Edit Orders',
+            'delete_orders' => 'Delete Orders',
+            'admin_orders' => 'Admin Orders',
+            'manage_discounts' => 'Manage Product Discounts'
+        ];
+
         // Run other seeders
         $this->call([
             CategorySeeder::class,

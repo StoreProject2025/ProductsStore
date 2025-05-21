@@ -402,144 +402,108 @@
     @yield('styles')
 </head>
 <body>
-    <!-- Top Bar -->
-    <div class="bg-light py-2 border-bottom">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <!-- Empty column for spacing -->
-                </div>
-                <div class="col-md-6">
-                    <div class="d-flex justify-content-end align-items-center">
-                        @auth
-                            <div class="dropdown">
-                                <button class="btn btn-link dropdown-toggle text-dark" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user me-1"></i>
-                                    {{ Auth::user()->name }}
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" style="z-index: 1050;">
-                                    <li><a class="dropdown-item" href="{{ route('profile') }}">Profile</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('orders') }}">Orders</a></li>
-                                    @if(auth()->user()->hasRole('Admin'))
-                                        <li><a class="dropdown-item" href="{{ route('users') }}">Users</a></li>
-                                    @endif
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <form method="POST" action="{{ route('logout') }}">
-                                            @csrf
-                                            <button type="submit" class="dropdown-item">Logout</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        @else
-                            <a href="{{ route('login') }}" class="btn btn-outline-primary me-2 px-4">Login</a>
-                            <a href="{{ route('register') }}" class="btn btn-primary px-4">Register</a>
-                        @endauth
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <i class="fas fa-shopping-bag text-primary me-2"></i>
+            <a class="navbar-brand" href="{{ route('welcome') }}">
+                <i class="fas fa-store"></i>
                 <span>E-Click</span>
             </a>
-
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home') }}">Home</a>
+                        <a class="nav-link" href="{{ route('welcome') }}">Home</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
                             Categories
                         </a>
                         <ul class="dropdown-menu">
-                            @if(auth()->check() && auth()->user()->is_admin)
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('categories.create') }}">
-                                        <i class="fas fa-plus-circle me-2"></i>
-                                        Add Category
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
+                            @if(isset($categories) && count($categories) > 0)
+                                @foreach($categories as $category)
+                                    <li class="dropend">
+                                        <a class="dropdown-item dropdown-toggle" href="#" data-category="{{ $category->id }}">
+                                            {{ $category->name }}
+                                        </a>
+                                        <ul class="dropdown-submenu" id="submenu-{{ $category->id }}">
+                                            @if(isset($category->subcategories) && count($category->subcategories) > 0)
+                                                @foreach($category->subcategories as $subcategory)
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('categories.show', $subcategory) }}">
+                                                            {{ $subcategory->name }}
+                                                        </a>
+                                                    </li>
+                                                @endforeach
+                                            @endif
+                                        </ul>
+                                    </li>
+                                @endforeach
+                            @else
+                                <li><a class="dropdown-item" href="{{ route('categories.index') }}">All Categories</a></li>
                             @endif
-                            <li class="dropend">
-                                <a class="dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                                    Electronics
-                                </a>
-                                <ul class="dropdown-menu dropdown-submenu">
-                                    <li><a class="dropdown-item" href="#">Smartphones</a></li>
-                                    <li><a class="dropdown-item" href="#">Laptops</a></li>
-                                    <li><a class="dropdown-item" href="#">Tablets</a></li>
-                                    <li><a class="dropdown-item" href="#">Accessories</a></li>
-                                </ul>
-                            </li>
-                            <li class="dropend">
-                                <a class="dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                                    Clothing
-                                </a>
-                                <ul class="dropdown-menu dropdown-submenu">
-                                    <li><a class="dropdown-item" href="#">Men's Fashion</a></li>
-                                    <li><a class="dropdown-item" href="#">Women's Fashion</a></li>
-                                    <li><a class="dropdown-item" href="#">Kids' Fashion</a></li>
-                                </ul>
-                            </li>
-                            <li><a class="dropdown-item" href="#">Books</a></li>
-                            <li><a class="dropdown-item" href="#">Special Offers</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('about') }}">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('contact') }}">Contact</a>
+                        <a class="nav-link" href="{{ route('products.index') }}">Products</a>
                     </li>
                 </ul>
-
-                <div class="d-flex align-items-center">
-                    <div class="me-3">
-                        @auth
-                            <a href="{{ route('wishlist') }}" class="text-dark position-relative">
-                                <i class="fas fa-heart {{ auth()->user()->wishlist()->count() > 0 ? 'text-danger' : '' }}"></i>
-                                <span class="badge bg-primary rounded-pill">{{ auth()->user()->wishlist()->count() }}</span>
-                            </a>
-                        @else
-                            <span class="auth-required" data-bs-toggle="modal" data-bs-target="#loginModal">
-                                <i class="fas fa-heart"></i>
-                                <span class="badge bg-primary rounded-pill">0</span>
-                            </span>
-                        @endauth
-                    </div>
-                    <div>
-                        @auth
-                            <a href="{{ route('cart') }}" class="text-dark position-relative">
-                                <i class="fas fa-shopping-cart {{ auth()->user()->cart()->count() > 0 ? 'text-primary' : '' }}"></i>
-                                <span class="badge bg-primary rounded-pill">{{ auth()->user()->cart()->count() }}</span>
-                            </a>
-                        @else
-                            <span class="auth-required" data-bs-toggle="modal" data-bs-target="#loginModal">
+                <ul class="navbar-nav">
+                    @auth
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('cart') }}">
                                 <i class="fas fa-shopping-cart"></i>
-                                <span class="badge bg-primary rounded-pill">0</span>
-                            </span>
-                        @endauth
-                    </div>
-                </div>
+                                <span class="badge bg-primary cart-count">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('wishlist') }}">
+                                <i class="fas fa-heart"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                {{ Auth::user()->name }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ route('profile', ['user' => auth()->id()]) }}">Profile</a></li>
+                                @if(Auth::user()->hasRole('admin'))
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Admin Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('admin.users.index') }}">Manage Users</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('admin.roles.index') }}">Manage Roles</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('admin.permissions.index') }}">Manage Permissions</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('admin.categories.index') }}">Manage Categories</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('admin.products.index') }}">Manage Products</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('admin.orders.index') }}">Manage Orders</a></li>
+                                @endif
+                                <li><a class="dropdown-item" href="{{ route('orders') }}">Orders</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('register') }}">Register</a>
+                        </li>
+                    @endauth
+                </ul>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="py-4">
+    <main>
         @yield('content')
     </main>
 
@@ -560,7 +524,7 @@
                 <div class="col-md-2 mb-4">
                     <h5 class="mb-3">Quick Links</h5>
                     <ul class="list-unstyled">
-                        <li><a href="{{ route('home') }}" class="text-light">Home</a></li>
+                        <li><a href="{{ route('welcome') }}" class="text-light">Home</a></li>
                         <li><a href="{{ route('categories.index') }}" class="text-light">Categories</a></li>
                         <li><a href="{{ route('products.index') }}" class="text-light">Products</a></li>
                         <li><a href="{{ route('about') }}" class="text-light">About</a></li>
@@ -711,6 +675,44 @@
             if (!$(e.target).closest('.dropdown-menu').length) {
                 $('.submenu').hide();
             }
+        });
+
+        // Add to Cart
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                if (this.classList.contains('auth-required')) {
+                    return;
+                }
+
+                const productId = this.dataset.productId;
+                // Add AJAX call to add product to cart
+                fetch('/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: 1
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update cart count
+                        document.querySelectorAll('.cart-count').forEach(el => {
+                            el.textContent = data.cartCount;
+                        });
+                        // Show success message
+                        alert('Product added to cart successfully');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error adding product to cart');
+                });
+            });
         });
     </script>
     @endsection

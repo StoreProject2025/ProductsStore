@@ -33,7 +33,8 @@ class PermissionSeeder extends Seeder
             'manage_products',
             'add_products',
             'edit_products',
-            'delete_products'
+            'delete_products',
+            'manage_discounts'
         ];
 
         foreach ($permissions as $permission) {

@@ -15,33 +15,22 @@ class Product extends Model
         'slug',
         'description',
         'price',
-        'discount_price',
-        'discount_percentage',
+        'discount',
         'stock',
         'category_id',
         'is_active',
         'is_featured',
         'is_flash_sale',
-        'image',
-        'gallery',
-        'average_rating'
-    ];
-
-    protected $attributes = [
-        'is_active' => true,
-        'is_flash_sale' => false,
-        'average_rating' => 0.00
+        'image'
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
-        'discount_price' => 'decimal:2',
-        'discount_percentage' => 'decimal:2',
-        'gallery' => 'array',
+        'discount' => 'decimal:2',
+        'stock' => 'integer',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
-        'is_flash_sale' => 'boolean',
-        'average_rating' => 'decimal:2'
+        'is_flash_sale' => 'boolean'
     ];
 
     public function category(): BelongsTo
@@ -80,5 +69,13 @@ class Product extends Model
     public function getAverageRatingAttribute()
     {
         return $this->ratings()->avg('rating') ?? 0;
+    }
+
+    public function getDiscountedPriceAttribute()
+    {
+        if ($this->discount > 0) {
+            return $this->price - ($this->price * ($this->discount / 100));
+        }
+        return $this->price;
     }
 }

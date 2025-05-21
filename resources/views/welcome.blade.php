@@ -39,9 +39,17 @@
         <div class="row">
             @foreach($categories as $category)
             <div class="col-md-4">
-                <a href="{{ route('categories.show', $category->slug) }}" class="text-decoration-none">
+                <a href="{{ route('categories.subcategories', $category->slug) }}" class="text-decoration-none">
                     <div class="category-card">
-                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}">
+                        @if($category->name === 'كتب' || $category->name === 'Books')
+                            <img src="https://as2.ftcdn.net/v2/jpg/00/05/86/25/1000_F_5862533_wQ6IJRVm6vLtub3aqirHc0AsUK3EfloS.jpg" alt="كتب">
+                        @elseif($category->name === 'Electronics')
+                            <img src="https://i.pcmag.com/imagery/lineups/067nHL7x7FLjB28RuLvKFzS-1.fit_lim.size_1600x900.v1569470817.jpg" alt="Electronics">
+                        @elseif($category->name === 'Clothing')
+                            <img src="https://thumb.photo-ac.com/6f/6f214267701ca13d20ed113b383e4c0d_t.jpeg" alt="Clothing">
+                        @else
+                            <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}">
+                        @endif
                         <div class="category-content">
                             <h3>{{ $category->name }}</h3>
                         </div>
@@ -65,9 +73,12 @@
                     <div class="product-content">
                         <h4>{{ $product->name }}</h4>
                         <div class="product-price">
-                            <span class="original">${{ $product->formatted_price }}</span>
-                            @if($product->discount_price)
-                                <span class="discount">${{ $product->formatted_discount_price }}</span>
+                            @if($product->discount > 0)
+                                <span class="original-price text-decoration-line-through text-muted">${{ number_format($product->price, 2) }}</span>
+                                <span class="discount-price text-danger fw-bold">${{ number_format($product->discounted_price, 2) }}</span>
+                                <span class="discount-badge bg-danger text-white rounded-pill px-2 py-1 ms-2">{{ $product->discount }}% OFF</span>
+                            @else
+                                <span class="price">${{ number_format($product->price, 2) }}</span>
                             @endif
                         </div>
                         <div class="product-rating">
@@ -329,22 +340,32 @@
     }
 
     .product-price {
+        margin: 10px 0;
         display: flex;
         align-items: center;
-        gap: 1rem;
-        margin-bottom: 1rem;
+        gap: 10px;
     }
 
-    .product-price .original {
-        text-decoration: line-through;
-        color: #999;
-        font-size: 1.1rem;
+    .original-price {
+        font-size: 0.9rem;
+        color: #6c757d;
     }
 
-    .product-price .discount {
-        color: #2196F3;
-        font-weight: 700;
-        font-size: 1.4rem;
+    .discount-price {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #dc3545;
+    }
+
+    .discount-badge {
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    .price {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #212529;
     }
 
     .product-rating {

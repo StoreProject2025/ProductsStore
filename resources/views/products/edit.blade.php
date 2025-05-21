@@ -13,7 +13,23 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('products.update', $product) }}" method="POST" enctype="multipart/form-data">
+                    @if (session('success'))
+                        <div class="alert alert-success">{{ session('success') }}</div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('products.update', $product->slug) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         
@@ -27,7 +43,7 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-            </div>
+                            </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="category_id" class="form-label">Category</label>
@@ -39,7 +55,7 @@
                                                 {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
                                                 {{ $category->name }}
                                             </option>
-        @endforeach
+                                        @endforeach
                                     </select>
                                     @error('category_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -73,6 +89,18 @@
                                 </div>
                             </div>
                         </div>
+
+                        @if(auth()->user()->hasPermissionTo('manage_discounts'))
+                        <div class="mb-3">
+                            <label for="discount" class="form-label">Discount (%)</label>
+                            <input type="number" step="0.01" min="0" max="100" class="form-control @error('discount') is-invalid @enderror" 
+                                id="discount" name="discount" value="{{ old('discount', $product->discount) }}">
+                            @error('discount')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="text-muted">Enter a value between 0 and 100</small>
+                        </div>
+                        @endif
 
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
@@ -117,9 +145,9 @@
                                         <input type="checkbox" class="form-check-input" id="is_featured" 
                                             name="is_featured" value="1" {{ old('is_featured', $product->is_featured) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="is_featured">Featured</label>
-            </div>
-            </div>
-        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <div class="form-check form-switch">
@@ -127,9 +155,9 @@
                                             name="is_flash_sale" value="1" {{ old('is_flash_sale', $product->is_flash_sale) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="is_flash_sale">Flash Sale</label>
                                     </div>
-            </div>
-            </div>
-        </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="d-flex justify-content-between mt-4">
                             <button type="submit" class="btn btn-primary">
@@ -140,9 +168,9 @@
                             </a>
                         </div>
                     </form>
-            </div>
-            </div>
-        </div>
+                </div>
             </div>
         </div>
+    </div>
+</div>
 @endsection

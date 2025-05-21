@@ -59,12 +59,15 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function wishlist()
     {
-        return $this->hasMany(Wishlist::class);
+        return $this->belongsToMany(Product::class, 'wishlists')
+            ->withTimestamps();
     }
 
     public function cart()
     {
-        return $this->hasMany(Cart::class);
+        return $this->belongsToMany(Product::class, 'carts')
+            ->withPivot('quantity')
+            ->withTimestamps();
     }
 
     public function orders()

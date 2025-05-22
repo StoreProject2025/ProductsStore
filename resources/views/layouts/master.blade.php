@@ -18,6 +18,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         :root {
             --primary-color: #CB0404;
@@ -447,15 +452,14 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('products.index') }}">Products</a>
+                        <a class="nav-link" href="{{ route('products.shop') }}">Products</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
                     @auth
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('cart') }}">
+                            <a href="{{ route('cart') }}" class="nav-link">
                                 <i class="fas fa-shopping-cart"></i>
-                                <span class="badge bg-primary cart-count">0</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -584,9 +588,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize all dropdowns
@@ -650,7 +651,6 @@
             @endauth
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/app.js') }}"></script>
 
     @section('scripts')
@@ -700,12 +700,13 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Update cart count
-                        document.querySelectorAll('.cart-count').forEach(el => {
-                            el.textContent = data.cartCount;
-                        });
                         // Show success message
-                        alert('Product added to cart successfully');
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Product added to cart successfully',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
                     }
                 })
                 .catch(error => {

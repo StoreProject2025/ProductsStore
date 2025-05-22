@@ -34,16 +34,34 @@ Route::post('/update-credit', [UsersController::class, 'updateCredit'])->name('u
 Route::post('/add-credit', [UsersController::class, 'addCredit'])->name('add.credit');
 Route::get('/purchases', [UsersController::class, 'purchases'])->name('purchases');
 
+// Cart Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart');
+    Route::post('/cart/add/{slug}', [CartController::class, 'add'])->name('cart.add');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
+    Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
+    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+});
+
+// Order Routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+});
+
 // Product Routes
-Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
-Route::get('/products/create', [ProductsController::class, 'create'])->name('products.create');
-Route::post('/products', [ProductsController::class, 'store'])->name('products.store');
-Route::get('/products/{product}/edit', [ProductsController::class, 'edit'])->name('products.edit');
-Route::put('/products/{product}', [ProductsController::class, 'update'])->name('products.update');
-Route::delete('/products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy');
-Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
-Route::post('/bought-products', [ProductsController::class, 'boughtProducts'])->name('bought_products_list');
+Route::get('/products', [ProductsController::class, 'shop'])->name('products.shop');
+Route::get('/products/manage', [ProductsController::class, 'index'])->name('products.index')->middleware('can:manage_products');
+Route::get('/products/create', [ProductsController::class, 'create'])->name('products.create')->middleware('can:add_products');
+Route::post('/products', [ProductsController::class, 'store'])->name('products.store')->middleware('can:add_products');
+Route::get('/products/{product}/edit', [ProductsController::class, 'edit'])->name('products.edit')->middleware('can:edit_products');
+Route::put('/products/{product}', [ProductsController::class, 'update'])->name('products.update')->middleware('can:edit_products');
+Route::delete('/products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy')->middleware('can:delete_products');
 Route::get('/products/insufficient_credit', [ProductsController::class, 'show'])->name('insufficient.credit');
+Route::get('/products/{product:slug}', [ProductsController::class, 'show'])->name('products.show');
 
 // Email Verification Routes
 Route::get('/email/verify', function () {
@@ -107,14 +125,6 @@ Route::put('/categories/{category}', [CategoryController::class, 'update'])->nam
 Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/categories/{category}/subcategories', [CategoryController::class, 'subcategories'])->name('categories.subcategories');
-
-// Cart Routes
-Route::middleware(['auth'])->group(function () {
-    Route::get('/cart', [CartController::class, 'index'])->name('cart');
-    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
-    Route::delete('/cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
-    Route::put('/cart/update/{product}', [CartController::class, 'update'])->name('cart.update');
-});
 
 // Wishlist Routes
 Route::middleware(['auth'])->group(function () {
